@@ -69,38 +69,6 @@ public class ConfigurationTest extends AbstractInfinispanTest {
       cacheManager.stop();
    }
 
-   @Test(enabled = false, description = "ISPN-3388")
-   public void testLegacyJavaConfig() {
-      GlobalConfiguration globalConfig = new GlobalConfigurationBuilder().globalJmxStatistics().transport().defaultTransport().build();
-
-      Configuration cacheConfig = new ConfigurationBuilder().loaders().addStore().cacheStore(new LevelDBCacheStore()).addProperty("location", tmpDataDirectory)
-            .addProperty("expiredLocation", tmpExpiredDirectory).addProperty("implementationType", LevelDBCacheStoreConfiguration.ImplementationType.AUTO.toString()).build();
-
-      EmbeddedCacheManager cacheManager = new DefaultCacheManager(globalConfig);
-
-      cacheManager.defineConfiguration("testCache", cacheConfig);
-
-      cacheManager.start();
-      Cache<String, String> cache = cacheManager.getCache("testCache");
-
-      cache.put("hello", "there legacy java");
-      cache.stop();
-      cacheManager.stop();
-   }
-
-   @Test(enabled = false, description = "ISPN-3388")
-   public void textXmlConfigLegacy() throws IOException {
-      EmbeddedCacheManager cacheManager = new DefaultCacheManager("config/leveldb-config-legacy-" +
-            LevelDBCacheStoreConfiguration.ImplementationType.AUTO.toString().toLowerCase() + ".xml");
-      Cache<String, String> cache = cacheManager.getCache("testCache");
-
-      cache.put("hello", "there legacy xml");
-      cache.stop();
-      cacheManager.stop();
-
-      TestingUtil.recursiveFileRemove("/tmp/leveldb/legacy");
-   }
-
    public void testXmlConfig52() throws IOException {
       EmbeddedCacheManager cacheManager = new DefaultCacheManager("config/leveldb-config-52-" +
             LevelDBCacheStoreConfiguration.ImplementationType.AUTO.toString().toLowerCase() + ".xml");
@@ -115,3 +83,4 @@ public class ConfigurationTest extends AbstractInfinispanTest {
    }
 
 }
+
