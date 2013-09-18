@@ -91,12 +91,24 @@ public class LevelDBStore implements AdvancedLoadWriteStore {
       expiryEntryQueue = new LinkedBlockingQueue<ExpiryEntry>(configuration.expiryQueueSize());
 
       try {
-         String cacheFileName = ctx.getCache().getName().replaceAll("[^a-zA-Z0-9-_\\.]", "_");
-         db = openDatabase(configuration.location() + cacheFileName, dataDbOptions());
-         expiredDb = openDatabase(configuration.expiredLocation() + cacheFileName, expiredDbOptions());
+         db = openDatabase(getQualifiedLocation(), dataDbOptions());
+         expiredDb = openDatabase(getQualifiedExpiredLocation(), expiredDbOptions());
       } catch (IOException e) {
          throw new CacheConfigurationException("Unable to open database", e);
       }
+   }
+
+   private String sanitizedCacheName() {
+      String cacheFileName = ctx.getCache().getName().replaceAll("[^a-zA-Z0-9-_\\.]", "_");
+      return cacheFileName;
+   }
+
+   private String getQualifiedLocation() {
+      return configuration.location() + sanitizedCacheName();
+   }
+
+   private String getQualifiedExpiredLocation() {
+      return configuration.expiredLocation() + sanitizedCacheName();
    }
 
    private Options dataDbOptions() {
@@ -153,8 +165,8 @@ public class LevelDBStore implements AdvancedLoadWriteStore {
       } catch (IOException e) {
          log.warnUnableToCloseExpiredDb(e);
       }
-      db = reinitDatabase(configuration.location(), dataDbOptions());
-      expiredDb = reinitDatabase(configuration.expiredLocation(), expiredDbOptions());
+      db = reinitDatabase(getQualifiedLocation(), dataDbOptions());
+      expiredDb = reinitDatabase(getQualifiedExpiredLocation(), expiredDbOptions());
    }
 
    @Override
